@@ -1,179 +1,446 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>$SPIN Roulette</title>
-  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
-      padding: 0;
       background: #3980fe;
-      color: #fff;
       font-family: 'Black Han Sans', sans-serif;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-x: hidden;
+      min-height: 100vh;
     }
 
-    header {
+    header, footer {
       width: 100%;
-      background: #0f2a5e;
-      padding: 10px 0;
       text-align: center;
-      box-shadow: 0 4px 15px rgba(255, 157, 70, 0.3);
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: 2.5em;
+      background: #0f2a5e;
+      padding: 10px;
       color: #ff9d46;
+      box-shadow: 0 4px 15px rgba(255, 157, 70, 0.3);
     }
 
     .roulette-container {
       position: relative;
-      width: 400px;
-      height: 400px;
-      margin: 40px auto 20px;
+      width: 600px;
+      height: 600px;
+      margin: 30px auto;
     }
 
-    .wheel {
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      border: 10px solid #c0c0c0;
-      position: relative;
-      transform: rotate(0deg);
-      transition: transform 60s linear;
-    }
-
-    .segment {
-      position: absolute;
-      width: 50%;
-      height: 50%;
-      transform-origin: 100% 100%;
-      clip-path: polygon(0% 0%, 100% 0%, 100% 100%);
-    }
-
-    .ball {
-      width: 20px;
-      height: 20px;
-      background-color: white;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      animation: spinBall 60s linear infinite;
-    }
-
-    @keyframes spinBall {
-      from {
-        transform: translate(-50%, -50%) rotate(0deg) translateX(180px) rotate(0deg);
-      }
-      to {
-        transform: translate(-50%, -50%) rotate(360deg) translateX(180px) rotate(-360deg);
-      }
+    canvas {
+      display: block;
     }
 
     .result {
-      text-align: center;
+      margin-top: 20px;
       font-size: 24px;
-      margin: 10px 0;
-      color: #ff9d46;
-    }
-
-    footer {
-      width: 100%;
-      background: #0f2a5e;
-      padding: 10px 0;
       text-align: center;
-      box-shadow: 0 -4px 15px rgba(255, 157, 70, 0.3);
-      margin-top: auto;
     }
 
-    footer p {
-      margin: 0;
-      color: #ff9d46;
+    .stats {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      width: 90%;
+      margin-top: 40px;
+    }
+
+    .stat-box {
+      background: #0f2a5e;
+      border: 2px solid #ff9d46;
+      padding: 10px 20px;
+      border-radius: 10px;
+      text-align: center;
+      min-width: 200px;
+      max-width: 250px;
+      box-shadow: 0 0 10px #ff9d46;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .stat-box span {
+      font-weight: bold;
+      display: inline-block;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .table {
+      width: 90%;
+      max-width: 600px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 5px;
+      margin-top: 30px;
+    }
+
+    .table div {
+      background: #0f2a5e;
+      padding: 10px;
+      border: 1px solid #ff9d46;
+      border-radius: 5px;
+      text-align: center;
+      color: white;
+      transition: background 0.3s;
+    }
+
+    .table div.highlighted {
+      background: #ff9d46;
+      color: #0f2a5e;
+    }
+
+    .chat {
+      background: #0f2a5e;
+      border: 2px solid #ff9d46;
+      padding: 15px;
+      width: 90%;
+      height: 200px;
+      margin: 20px auto;
+      overflow-y: auto;
+      border-radius: 10px;
+      box-shadow: 0 0 15px #ff9d46;
+    }
+
+    .chat p {
+      margin: 5px 0;
+      color: #fff;
+    }
+
+    .chat-input {
+      width: 90%;
+      margin: 10px auto;
+    }
+
+    input {
+      width: 70%;
+      padding: 10px;
+      background: #1e4a8e;
+      border: 2px solid #ff9d46;
+      color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 0 5px #ff9d46;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #ff9d46;
+      border: none;
+      color: #0f2a5e;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #e08c3e;
+      box-shadow: 0 0 10px #ff9d46;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    #spinLogoTopRight {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 75px;
+      height: 75px;
+      animation: spin 5s linear infinite;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>$SPIN Roulette</h1>
-  </header>
+  <header><h1>$SPIN Roulette</h1></header>
+  <img src="spin-logo.png" id="spinLogoTopRight" alt="SPIN Logo" onerror="console.error('Failed to load top right logo: spin-logo.png')">
 
   <div class="roulette-container">
-    <div class="wheel" id="wheel"></div>
-    <div class="ball" id="ball"></div>
+    <canvas id="rouletteWheel" width="600" height="600"></canvas>
+    <div class="result" id="result">Spinning... 🎲</div>
   </div>
 
-  <div class="result" id="result">Spinning...</div>
+  <div class="stats">
+    <div class="stat-box">Numbers: <span id="numbers"></span></div>
+    <div class="stat-box">Burned: <span id="burned">0</span> $SPIN</div>
+    <div class="stat-box">Left to Burn: <span id="left">10,000,000</span> $SPIN</div>
+  </div>
 
-  <footer>
-    <p>© 2025 $SPIN Roulette - All Rights Reserved</p>
-  </footer>
+  <div class="table" id="numberTable">
+    <div>0</div><div>00</div><div>1</div><div>2</div><div>3</div><div>4</div>
+    <div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
+    <div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div>
+    <div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div>22</div>
+    <div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div>
+    <div>29</div><div>30</div><div>31</div><div>32</div><div>33</div><div>34</div>
+    <div>35</div><div>36</div>
+  </div>
+
+  <div class="chat" id="chatBox"></div>
+  <div class="chat-input">
+    <input type="text" id="chatInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <footer><p>© 2025 $SPIN Roulette</p></footer>
 
   <script>
-    const wheel = document.getElementById('wheel');
-    const ball = document.getElementById('ball');
-    const resultDisplay = document.getElementById('result');
+    const canvas = document.getElementById('rouletteWheel');
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const radius = width / 2 - 45;
+    const centerX = width / 2;
+    const centerY = height / 2;
 
     const numbers = [
-      '0', '28', '9', '26', '30', '11', '7', '20', '32', '17',
-      '5', '22', '34', '15', '3', '24', '36', '13', '1', '00',
-      '27', '10', '25', '29', '12', '8', '19', '31', '18', '6',
-      '21', '33', '16', '4', '23', '35', '14', '2'
+      '0', '28', '9', '26', '30', '11', '7', '20', '32', '17', '5', '22', '34', '15', '3', '24', '36', '13', '1',
+      '00', '27', '10', '25', '29', '12', '8', '19', '31', '18', '6', '21', '33', '16', '4', '23', '35', '14', '2'
     ];
-
     const colors = numbers.map(num => {
-      if (num === '0' || num === '00') return 'green';
-      return [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36].includes(parseInt(num)) ? 'red' : 'black';
+      if (num === '0' || num === '00') return '#006400'; // Darker green
+      const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
+      return redNumbers.includes(parseInt(num)) ? '#8B0000' : '#000000'; // Darker red
     });
 
-    function createWheel() {
-      const angleStep = 360 / numbers.length;
-      numbers.forEach((num, i) => {
-        const segment = document.createElement('div');
-        segment.className = 'segment';
-        segment.style.transform = `rotate(${i * angleStep}deg)`;
-        segment.style.backgroundColor = colors[i];
-        wheel.appendChild(segment);
+    const spinLogo = new Image();
+    spinLogo.src = 'spin-logo.png';
+    let logoLoaded = false;
+    spinLogo.onload = function() {
+      logoLoaded = true;
+      console.log('Spin logo loaded successfully for canvas');
+    };
+    spinLogo.onerror = function() {
+      console.error('Failed to load spin-logo.png for canvas');
+    };
+
+    function drawWheel(angle = 0) {
+      ctx.clearRect(0, 0, width, height);
+
+      // Draw outer rim
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius + 45, 0, Math.PI * 2);
+      ctx.fillStyle = '#D4A017'; // Dark gold trim
+      ctx.fill();
+
+      // Draw ball track
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius + 30, 0, Math.PI * 2);
+      ctx.fillStyle = '#A0522D'; // Dark tan
+      ctx.fill();
+
+      // Draw pockets
+      const angleStep = Math.PI * 2 / numbers.length;
+      const squareDepth = 20;
+      const squareStart = radius - 45;
+      numbers.forEach((num, index) => {
+        const startAngle = index * angleStep + angle;
+        const endAngle = startAngle + angleStep;
+
+        // Draw the full pocket with its color
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = colors[index];
+        ctx.fill();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Draw squared section below the number using clipping
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, squareStart, startAngle, endAngle);
+        ctx.arc(centerX, centerY, squareStart - squareDepth, endAngle, startAngle, true);
+        ctx.closePath();
+        ctx.clip();
+
+        ctx.fillStyle = colors[index];
+        const squareWidth = squareStart * angleStep * 0.8;
+        const midAngle = startAngle + angleStep / 2;
+        ctx.translate(centerX, centerY);
+        ctx.rotate(midAngle);
+        ctx.fillRect(-squareWidth / 2, -squareStart, squareWidth, -squareDepth);
+        ctx.restore();
+
+        // Overlay the outer portion with dark gold
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, squareStart - squareDepth, startAngle, endAngle);
+        ctx.closePath();
+        ctx.fillStyle = '#D4A017';
+        ctx.fill();
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Draw number
+        ctx.save();
+        ctx.translate(centerX, centerY);
+        ctx.rotate(startAngle + angleStep / 2);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 20px "Black Han Sans"';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(num, radius - 15, 0);
+        ctx.restore();
+      });
+
+      // Draw dividers
+      for (let i = 0; i < numbers.length; i++) {
+        const dividerAngle = i * angleStep + angle;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(centerX + radius * Math.cos(dividerAngle), centerY + radius * Math.sin(dividerAngle));
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+
+      // Draw central hub
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius / 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#333';
+      ctx.fill();
+
+      // Draw $SPIN logo in center
+      if (logoLoaded) {
+        const logoSize = radius / 2 * 0.8;
+        const logoX = centerX - logoSize / 2;
+        const logoY = centerY - logoSize / 2;
+        ctx.drawImage(spinLogo, logoX, logoY, logoSize, logoSize);
+      }
+    }
+
+    function drawBall(ballTrackRadius, ballAngle) {
+      const ballRadius = 12;
+      const ballX = centerX + ballTrackRadius * Math.cos(ballAngle);
+      const ballY = centerY + ballTrackRadius * Math.sin(ballAngle);
+      ctx.beginPath();
+      ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+    }
+
+    function highlightWinningNumber(winner) {
+      const numberDivs = document.querySelectorAll('.table div');
+      numberDivs.forEach(div => {
+        div.classList.remove('highlighted');
+        if (div.textContent === winner) {
+          div.classList.add('highlighted');
+        }
       });
     }
 
-    function spinWheel() {
-      const spinDuration = 60000; // 60 seconds
-      const displayDuration = 60000;
+    let spinAngle = 0;
+    let ballAngle = 0;
+    let spinSpeed = Math.PI / 120;
+    let ballSpeed = Math.PI / 150;
+    let state = 'spinning';
+    let burned = 0;
+    let recent = [];
+    let spinStartTime = performance.now();
+    let targetAngle = 0;
+    let targetIndex = 0;
+    let winner = '';
+    const initialSpinDuration = 45000; // 45 seconds
+    const landingSpinDuration = 5000; // 5 seconds;
 
-      wheel.style.transition = 'none';
-      wheel.style.transform = 'rotate(0deg)';
-      void wheel.offsetWidth;
-
-      wheel.style.transition = `transform ${spinDuration}ms linear`;
-      wheel.style.transform = `rotate(${360 * 10}deg)`;
-
-      setTimeout(() => {
-        const winningIndex = Math.floor(Math.random() * numbers.length);
-        const winningNumber = numbers[winningIndex];
-        resultDisplay.textContent = `Winning Number: ${winningNumber}`;
-
-        ball.style.animation = 'none';
-        const angle = (360 / numbers.length) * winningIndex;
-        ball.style.transform = `translate(-50%, -50%) rotate(${angle}deg) translateX(180px)`;
-
-        setTimeout(() => {
-          resultDisplay.textContent = 'Spinning...';
-          ball.style.animation = 'spinBall 60s linear infinite';
-          spinWheel();
-        }, displayDuration);
-      }, spinDuration);
+    function startNewSpin() {
+      spinSpeed = Math.PI / 120 + (Math.random() - 0.5) * 0.05;
+      ballSpeed = Math.PI / 150 + (Math.random() - 0.5) * 0.05;
+      ballAngle = Math.random() * 2 * Math.PI; // Random landing position
+      state = 'spinning';
+      spinStartTime = performance.now();
+      document.getElementById('result').textContent = 'Spinning... 🎲';
     }
 
-    createWheel();
-    spinWheel();
+    function animate(time) {
+      let ballRadius;
+      const elapsed = time - spinStartTime;
+
+      if (state === 'spinning') {
+        ballRadius = radius + 30;
+        spinAngle += spinSpeed;
+        ballAngle += ballSpeed;
+
+        if (elapsed >= initialSpinDuration) {
+          targetIndex = Math.floor(Math.random() * numbers.length);
+          winner = numbers[targetIndex];
+          const angleStep = Math.PI * 2 / numbers.length;
+          targetAngle = (ballAngle - targetIndex * angleStep + Math.PI * 2) % (Math.PI * 2) + (Math.floor(Math.random() * 5) + 5) * Math.PI * 2;
+          state = 'landingSpin';
+          spinStartTime = time;
+          // Immediately drop speed by 90% and match ball speed
+          spinSpeed *= 0.1;
+          ballSpeed = spinSpeed;
+        }
+      } else if (state === 'landingSpin') {
+        ballRadius = radius + 30 - ((radius + 30 - 0.6375 * radius) * (elapsed / landingSpinDuration));
+        spinAngle += spinSpeed;
+        ballAngle += ballSpeed;
+
+        const remainingAngle = (targetAngle - spinAngle + Math.PI * 2) % (Math.PI * 2);
+        const elapsedLanding = time - spinStartTime;
+        if (elapsedLanding >= landingSpinDuration || remainingAngle < spinSpeed * 2) {
+          spinAngle = targetAngle;
+          spinSpeed = 0;
+          ballSpeed = 0;
+          state = 'result';
+          spinStartTime = time;
+        } else {
+          // Continue gradual deceleration
+          const progress = elapsedLanding / landingSpinDuration;
+          spinSpeed = (spinSpeed) * (1 - progress);
+          ballSpeed = spinSpeed;
+        }
+      } else if (state === 'result') {
+        ballRadius = 0.6375 * radius; // Ball stays at 63.75% of radius
+        document.getElementById('result').textContent = `🎉 Winning Number: ${winner}`;
+        highlightWinningNumber(winner);
+        if (winner === '0') {
+          burned += 0.015;
+          document.getElementById('burned').textContent = burned.toFixed(3);
+          document.getElementById('left').textContent = (10000000 - burned).toFixed(3);
+        }
+        if (recent.length >= 4) {
+          recent = [];
+          document.getElementById('numbers').textContent = '';
+        }
+        recent.unshift(winner);
+        document.getElementById('numbers').textContent = recent.join(', ');
+        setTimeout(() => {
+          startNewSpin();
+        }, 60000);
+      }
+
+      drawWheel(spinAngle);
+      drawBall(ballRadius, ballAngle);
+      requestAnimationFrame(animate);
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const chatBox = document.getElementById('chatBox');
+      if (input.value) {
+        chatBox.innerHTML += `<p>${input.value}</p>`;
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+      }
+    }
+
+    requestAnimationFrame(animate);
   </script>
 </body>
 </html>
