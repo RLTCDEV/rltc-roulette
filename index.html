@@ -9,6 +9,11 @@
     body {
       margin: 0;
       background: #3980fe;
+      background-image: url('background.jpg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
       font-family: 'Black Han Sans', sans-serif;
       color: #fff;
       display: flex;
@@ -20,27 +25,75 @@
     header, footer {
       width: 100%;
       text-align: center;
-      background: #0f2a5e;
+      background: rgba(15, 42, 94, 0.9);
       padding: 10px;
       color: #ff9d46;
       box-shadow: 0 4px 15px rgba(255, 157, 70, 0.3);
     }
 
+    .game-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      width: 90%;
+      max-width: 1400px;
+      margin: 30px auto;
+      gap: 20px;
+      padding-bottom: 30px;
+    }
+
+    .wheel-and-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 864px;
+    }
+
     .roulette-container {
       position: relative;
-      width: 600px;
-      height: 600px;
-      margin: 30px auto;
+      width: 864px;
+      height: 864px;
+      background: rgba(15, 42, 94, 0.8);
+      border-radius: 10px;
+      padding: 10px;
     }
 
     canvas {
       display: block;
+      width: 864px;
+      height: 864px;
     }
 
     .result {
       margin-top: 20px;
-      font-size: 24px;
+      font-size: 29px;
       text-align: center;
+      background: rgba(15, 42, 94, 0.8);
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .numbers-box {
+      background: rgba(15, 42, 94, 0.9);
+      border: 2px solid #ff9d46;
+      padding: 10px;
+      border-radius: 10px;
+      width: 240px;
+      height: 600px;
+      overflow-y: auto;
+      box-shadow: 0 0 10px #ff9d46;
+      font-size: 19px;
+      line-height: 1.5;
+    }
+
+    .numbers-box span {
+      display: block;
+      white-space: nowrap;
+    }
+
+    .below-wheel {
+      width: 864px;
+      margin: 0 auto;
     }
 
     .stats {
@@ -48,22 +101,23 @@
       justify-content: center;
       flex-wrap: wrap;
       gap: 20px;
-      width: 90%;
-      margin-top: 40px;
+      margin-top: 10vh;
+      transform: translateX(10%);
     }
 
     .stat-box {
-      background: #0f2a5e;
+      background: rgba(15, 42, 94, 0.9);
       border: 2px solid #ff9d46;
-      padding: 10px 20px;
+      padding: 12px 24px;
       border-radius: 10px;
       text-align: center;
-      min-width: 200px;
-      max-width: 250px;
+      min-width: 240px;
+      max-width: 300px;
       box-shadow: 0 0 10px #ff9d46;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-size: 19px;
     }
 
     .stat-box span {
@@ -75,22 +129,23 @@
     }
 
     .table {
-      width: 90%;
-      max-width: 600px;
+      width: 100%;
       display: grid;
       grid-template-columns: repeat(6, 1fr);
       gap: 5px;
       margin-top: 30px;
+      transform: translateX(-18%);
     }
 
     .table div {
-      background: #0f2a5e;
-      padding: 10px;
+      background: rgba(15, 42, 94, 0.9);
+      padding: 12px;
       border: 1px solid #ff9d46;
       border-radius: 5px;
       text-align: center;
       color: white;
       transition: background 0.3s;
+      font-size: 19px;
     }
 
     .table div.highlighted {
@@ -99,11 +154,11 @@
     }
 
     .chat {
-      background: #0f2a5e;
+      background: rgba(15, 42, 94, 0.9);
       border: 2px solid #ff9d46;
-      padding: 15px;
+      padding: 18px;
       width: 90%;
-      height: 200px;
+      height: 240px;
       margin: 20px auto;
       overflow-y: auto;
       border-radius: 10px;
@@ -122,8 +177,8 @@
 
     input {
       width: 70%;
-      padding: 10px;
-      background: #1e4a8e;
+      padding: 12px;
+      background: rgba(30, 74, 142, 0.9);
       border: 2px solid #ff9d46;
       color: #fff;
       border-radius: 5px;
@@ -131,7 +186,7 @@
     }
 
     button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       background: #ff9d46;
       border: none;
       color: #0f2a5e;
@@ -154,9 +209,28 @@
       position: absolute;
       top: 10px;
       right: 10px;
-      width: 75px;
-      height: 75px;
+      width: 90px;
+      height: 90px;
       animation: spin 5s linear infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+        color: #ff9d46;
+      }
+      50% {
+        transform: scale(1.1);
+        color: #ffd700;
+      }
+      100% {
+        transform: scale(1);
+        color: #ff9d46;
+      }
+    }
+
+    header h1 {
+      animation: pulse 2s ease-in-out infinite;
     }
   </style>
 </head>
@@ -164,25 +238,31 @@
   <header><h1>$SPIN Roulette</h1></header>
   <img src="spin-logo.png" id="spinLogoTopRight" alt="SPIN Logo" onerror="console.error('Failed to load top right logo: spin-logo.png')">
 
-  <div class="roulette-container">
-    <canvas id="rouletteWheel" width="600" height="600"></canvas>
-    <div class="result" id="result">Spinning... 🎲</div>
+  <div class="game-container">
+    <div class="wheel-and-stats">
+      <div class="roulette-container">
+        <canvas id="rouletteWheel" width="864" height="864"></canvas>
+        <div class="result" id="result">Spinning... 🎲</div>
+      </div>
+      <div class="stats">
+        <div class="stat-box">Burned: <span id="burned">0</span> $SPIN</div>
+        <div class="stat-box">Left to Burn 1: <span id="left1">10,000,000</span> $SPIN</div>
+        <div class="stat-box">Left to Burn 2: <span id="left2">200,000,000</span> $SPIN</div>
+      </div>
+    </div>
+    <div class="numbers-box" id="numbers"></div>
   </div>
 
-  <div class="stats">
-    <div class="stat-box">Numbers: <span id="numbers"></span></div>
-    <div class="stat-box">Burned: <span id="burned">0</span> $SPIN</div>
-    <div class="stat-box">Left to Burn: <span id="left">10,000,000</span> $SPIN</div>
-  </div>
-
-  <div class="table" id="numberTable">
-    <div>0</div><div>00</div><div>1</div><div>2</div><div>3</div><div>4</div>
-    <div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
-    <div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div>
-    <div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div>22</div>
-    <div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div>
-    <div>29</div><div>30</div><div>31</div><div>32</div><div>33</div><div>34</div>
-    <div>35</div><div>36</div>
+  <div class="below-wheel">
+    <div class="table" id="numberTable">
+      <div>0</div><div>00</div><div>1</div><div>2</div><div>3</div><div>4</div>
+      <div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div>
+      <div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div>
+      <div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div>22</div>
+      <div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div>
+      <div>29</div><div>30</div><div>31</div><div>32</div><div>33</div><div>34</div>
+      <div>35</div><div>36</div>
+    </div>
   </div>
 
   <div class="chat" id="chatBox"></div>
@@ -195,10 +275,18 @@
 
   <script>
     const canvas = document.getElementById('rouletteWheel');
+    if (!canvas) {
+      console.error('Canvas element not found!');
+      throw new Error('Canvas element not found');
+    }
     const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.error('Failed to get 2D context for canvas!');
+      throw new Error('Failed to get 2D context');
+    }
     const width = canvas.width;
     const height = canvas.height;
-    const radius = width / 2 - 45;
+    const radius = width / 2 - 64;
     const centerX = width / 2;
     const centerY = height / 2;
 
@@ -207,9 +295,9 @@
       '00', '27', '10', '25', '29', '12', '8', '19', '31', '18', '6', '21', '33', '16', '4', '23', '35', '14', '2'
     ];
     const colors = numbers.map(num => {
-      if (num === '0' || num === '00') return '#006400'; // Darker green
+      if (num === '0' || num === '00') return '#003300';
       const redNumbers = [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36];
-      return redNumbers.includes(parseInt(num)) ? '#8B0000' : '#000000'; // Darker red
+      return redNumbers.includes(parseInt(num)) ? '#5A0000' : '#000000';
     });
 
     const spinLogo = new Image();
@@ -223,224 +311,291 @@
       console.error('Failed to load spin-logo.png for canvas');
     };
 
+    let winningIndex;
+    let targetRelAngle;
+    let initialWheelAngle, initialBallAngle, finalWheelAngle, finalBallAngle;
+    let slowdownInitDone = false;
+
+    let spinAngle = 0;
+    let ballAngle = 0;
+    const wheelSpeed = (Math.PI / 141.176) * 60;
+    const ballSpeed = (2 * Math.PI / 141.176) * 60;
+    let currentWheelSpeed = wheelSpeed;
+    let currentBallSpeed = ballSpeed;
+    let state = 'spinning';
+    let totalBurned = 0;
+    let leftToBurn1 = 10000000;
+    let leftToBurn2 = 200000000;
+    let recent = [];
+    let startTime = performance.now();
+    let lastTime = startTime;
+    let winner = '';
+    let showBall = true;
+    const spinningDuration = 30000;
+    const ballSlowdownDuration = 20000;
+    const resultDuration = 10000;
+    const cycleDuration = spinningDuration + ballSlowdownDuration + resultDuration;
+    const maxRecent = 20;
+
+    function easeOutQuad(t) {
+      return 1 - (1 - t) * (1 - t);
+    }
+
     function drawWheel(angle = 0) {
-      ctx.clearRect(0, 0, width, height);
+      try {
+        ctx.clearRect(0, 0, width, height);
 
-      // Draw outer rim
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius + 45, 0, Math.PI * 2);
-      ctx.fillStyle = '#D4A017'; // Dark gold trim
-      ctx.fill();
-
-      // Draw ball track
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius + 30, 0, Math.PI * 2);
-      ctx.fillStyle = '#A0522D'; // Dark tan
-      ctx.fill();
-
-      // Draw pockets
-      const angleStep = Math.PI * 2 / numbers.length;
-      const squareDepth = 20;
-      const squareStart = radius - 45;
-      numbers.forEach((num, index) => {
-        const startAngle = index * angleStep + angle;
-        const endAngle = startAngle + angleStep;
-
-        // Draw the full pocket with its color
         ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
-        ctx.closePath();
-        ctx.fillStyle = colors[index];
-        ctx.fill();
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        // Draw squared section below the number using clipping
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, squareStart, startAngle, endAngle);
-        ctx.arc(centerX, centerY, squareStart - squareDepth, endAngle, startAngle, true);
-        ctx.closePath();
-        ctx.clip();
-
-        ctx.fillStyle = colors[index];
-        const squareWidth = squareStart * angleStep * 0.8;
-        const midAngle = startAngle + angleStep / 2;
-        ctx.translate(centerX, centerY);
-        ctx.rotate(midAngle);
-        ctx.fillRect(-squareWidth / 2, -squareStart, squareWidth, -squareDepth);
-        ctx.restore();
-
-        // Overlay the outer portion with dark gold
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, squareStart - squareDepth, startAngle, endAngle);
-        ctx.closePath();
+        ctx.arc(centerX, centerY, radius + 64, 0, Math.PI * 2);
         ctx.fillStyle = '#D4A017';
         ctx.fill();
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1;
-        ctx.stroke();
 
-        // Draw number
-        ctx.save();
-        ctx.translate(centerX, centerY);
-        ctx.rotate(startAngle + angleStep / 2);
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 20px "Black Han Sans"';
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(num, radius - 15, 0);
-        ctx.restore();
-      });
-
-      // Draw dividers
-      for (let i = 0; i < numbers.length; i++) {
-        const dividerAngle = i * angleStep + angle;
         ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.lineTo(centerX + radius * Math.cos(dividerAngle), centerY + radius * Math.sin(dividerAngle));
-        ctx.strokeStyle = '#333';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
+        ctx.arc(centerX, centerY, radius + 43, 0, Math.PI * 2);
+        ctx.fillStyle = '#A0522D';
+        ctx.fill();
 
-      // Draw central hub
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius / 2, 0, Math.PI * 2);
-      ctx.fillStyle = '#333';
-      ctx.fill();
+        const angleStep = Math.PI * 2 / numbers.length;
+        const squareDepth = 29;
+        const squareStart = radius - 64;
+        numbers.forEach((num, index) => {
+          const startAngle = index * angleStep + angle;
+          const endAngle = startAngle + angleStep;
 
-      // Draw $SPIN logo in center
-      if (logoLoaded) {
-        const logoSize = radius / 2 * 0.8;
-        const logoX = centerX - logoSize / 2;
-        const logoY = centerY - logoSize / 2;
-        ctx.drawImage(spinLogo, logoX, logoY, logoSize, logoSize);
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+          ctx.closePath();
+          ctx.fillStyle = colors[index];
+          ctx.fill();
+          ctx.strokeStyle = '#333';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.arc(centerX, centerY, squareStart, startAngle, endAngle);
+          ctx.arc(centerX, centerY, squareStart - squareDepth, endAngle, startAngle, true);
+          ctx.closePath();
+          ctx.clip();
+
+          ctx.fillStyle = colors[index];
+          const squareWidth = squareStart * angleStep * 0.8;
+          const midAngle = startAngle + angleStep / 2;
+          ctx.translate(centerX, centerY);
+          ctx.rotate(midAngle);
+          ctx.fillRect(-squareWidth / 2, -squareStart, squareWidth, -squareDepth);
+          ctx.restore();
+
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.arc(centerX, centerY, squareStart - squareDepth, startAngle, endAngle);
+          ctx.closePath();
+          ctx.fillStyle = '#D4A017';
+          ctx.fill();
+          ctx.strokeStyle = '#333';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+
+          ctx.save();
+          ctx.translate(centerX, centerY);
+          ctx.rotate(startAngle + angleStep / 2);
+          ctx.fillStyle = '#fff';
+          ctx.font = 'bold 29px "Black Han Sans"';
+          ctx.textAlign = 'right';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(num, radius - 22, 0);
+          ctx.restore();
+        });
+
+        for (let i = 0; i < numbers.length; i++) {
+          const dividerAngle = i * angleStep + angle;
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(centerX + radius * Math.cos(dividerAngle), centerY + radius * Math.sin(dividerAngle));
+          ctx.strokeStyle = '#333';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius / 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#e2af83';
+        ctx.fill();
+
+        if (logoLoaded) {
+          const hubSize = radius / 2 * 2.73;
+          const imgAspect = spinLogo.width / spinLogo.height;
+          let logoWidth = hubSize;
+          let logoHeight = hubSize;
+          if (imgAspect > 1) {
+            logoHeight = hubSize / imgAspect;
+          } else {
+            logoWidth = hubSize * imgAspect;
+          }
+          const logoX = centerX - logoWidth / 2;
+          const logoY = centerY - logoHeight / 2;
+          ctx.drawImage(spinLogo, logoX, logoY, logoWidth, logoHeight);
+        }
+      } catch (e) {
+        console.error('Error in drawWheel:', e);
       }
     }
 
     function drawBall(ballTrackRadius, ballAngle) {
-      const ballRadius = 12;
-      const ballX = centerX + ballTrackRadius * Math.cos(ballAngle);
-      const ballY = centerY + ballTrackRadius * Math.sin(ballAngle);
-      ctx.beginPath();
-      ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
-      ctx.fillStyle = '#fff';
-      ctx.fill();
+      try {
+        const ballRadius = 14;
+        const ballX = centerX + ballTrackRadius * Math.cos(ballAngle);
+        const ballY = centerY + ballTrackRadius * Math.sin(ballAngle);
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      } catch (e) {
+        console.error('Error in drawBall:', e);
+      }
     }
 
     function highlightWinningNumber(winner) {
-      const numberDivs = document.querySelectorAll('.table div');
-      numberDivs.forEach(div => {
-        div.classList.remove('highlighted');
-        if (div.textContent === winner) {
-          div.classList.add('highlighted');
-        }
-      });
+      try {
+        const numberDivs = document.querySelectorAll('.table div');
+        numberDivs.forEach(div => {
+          div.classList.remove('highlighted');
+          if (div.textContent === winner) div.classList.add('highlighted');
+        });
+      } catch (e) {
+        console.error('Error in highlightWinningNumber:', e);
+      }
     }
 
-    let spinAngle = 0;
-    let ballAngle = 0;
-    let spinSpeed = Math.PI / 120;
-    let ballSpeed = Math.PI / 150;
-    let state = 'spinning';
-    let burned = 0;
-    let recent = [];
-    let spinStartTime = performance.now();
-    let targetAngle = 0;
-    let targetIndex = 0;
-    let winner = '';
-    const initialSpinDuration = 45000; // 45 seconds
-    const landingSpinDuration = 5000; // 5 seconds;
-
     function startNewSpin() {
-      spinSpeed = Math.PI / 120 + (Math.random() - 0.5) * 0.05;
-      ballSpeed = Math.PI / 150 + (Math.random() - 0.5) * 0.05;
-      ballAngle = Math.random() * 2 * Math.PI; // Random landing position
-      state = 'spinning';
-      spinStartTime = performance.now();
-      document.getElementById('result').textContent = 'Spinning... 🎲';
+      try {
+        startTime = performance.now();
+        lastTime = startTime;
+        spinAngle = Math.random() * 2 * Math.PI;
+        ballAngle = Math.random() * 2 * Math.PI;
+        currentWheelSpeed = wheelSpeed * (0.9 + Math.random() * 0.2);
+        currentBallSpeed = ballSpeed * (0.8 + Math.random() * 0.4);
+        state = 'spinning';
+        showBall = true;
+        winner = '';
+        slowdownInitDone = false;
+        winningIndex = Math.floor(Math.random() * numbers.length);
+        const angleStep = 2 * Math.PI / numbers.length;
+        targetRelAngle = (winningIndex + 0.5) * angleStep;
+        document.getElementById('result').textContent = 'Spinning... 🎲';
+      } catch (e) {
+        console.error('Error in startNewSpin:', e);
+      }
     }
 
     function animate(time) {
-      let ballRadius;
-      const elapsed = time - spinStartTime;
+      try {
+        const deltaTime = time - lastTime;
+        lastTime = time;
+        const elapsed = time - startTime;
+        let ballRadius = radius + 22;
 
-      if (state === 'spinning') {
-        ballRadius = radius + 30;
-        spinAngle += spinSpeed;
-        ballAngle += ballSpeed;
-
-        if (elapsed >= initialSpinDuration) {
-          targetIndex = Math.floor(Math.random() * numbers.length);
-          winner = numbers[targetIndex];
-          const angleStep = Math.PI * 2 / numbers.length;
-          targetAngle = (ballAngle - targetIndex * angleStep + Math.PI * 2) % (Math.PI * 2) + (Math.floor(Math.random() * 5) + 5) * Math.PI * 2;
-          state = 'landingSpin';
-          spinStartTime = time;
-          // Immediately drop speed by 90% and match ball speed
-          spinSpeed *= 0.1;
-          ballSpeed = spinSpeed;
-        }
-      } else if (state === 'landingSpin') {
-        ballRadius = radius + 30 - ((radius + 30 - 0.6375 * radius) * (elapsed / landingSpinDuration));
-        spinAngle += spinSpeed;
-        ballAngle += ballSpeed;
-
-        const remainingAngle = (targetAngle - spinAngle + Math.PI * 2) % (Math.PI * 2);
-        const elapsedLanding = time - spinStartTime;
-        if (elapsedLanding >= landingSpinDuration || remainingAngle < spinSpeed * 2) {
-          spinAngle = targetAngle;
-          spinSpeed = 0;
-          ballSpeed = 0;
+        if (elapsed < spinningDuration) {
+          state = 'spinning';
+          showBall = true;
+          spinAngle += currentWheelSpeed * (deltaTime / 1000);
+          ballAngle -= currentBallSpeed * (deltaTime / 1000);
+        } else if (elapsed < spinningDuration + ballSlowdownDuration) {
+          state = 'ballSlowdown';
+          if (!slowdownInitDone) {
+            initialWheelAngle = spinAngle;
+            initialBallAngle = ballAngle;
+            const T = ballSlowdownDuration / 1000;
+            finalWheelAngle = initialWheelAngle + (currentWheelSpeed * T / 2);
+            const R0 = initialBallAngle - initialWheelAngle;
+            const deltaR_expected = - (currentBallSpeed + currentWheelSpeed) * T / 2;
+            const K = Math.round((R0 + deltaR_expected - targetRelAngle) / (2 * Math.PI));
+            finalBallAngle = finalWheelAngle + targetRelAngle + K * 2 * Math.PI;
+            slowdownInitDone = true;
+          }
+          const slowdownElapsed = elapsed - spinningDuration;
+          const progress = Math.min(slowdownElapsed / ballSlowdownDuration, 1);
+          const easedProgress = easeOutQuad(progress);
+          spinAngle = initialWheelAngle + easedProgress * (finalWheelAngle - initialWheelAngle);
+          ballAngle = initialBallAngle + easedProgress * (finalBallAngle - initialBallAngle);
+          ballRadius = radius + 22 + easedProgress * (-46);
+        } else if (elapsed < cycleDuration) {
           state = 'result';
-          spinStartTime = time;
+          spinAngle = finalWheelAngle % (2 * Math.PI);
+          ballAngle = finalBallAngle % (2 * Math.PI);
+          ballRadius = radius - 25;
+          if (!winner) {
+            winner = numbers[winningIndex];
+            document.getElementById('result').textContent = `🎉 Winning Number: ${winner}`;
+            highlightWinningNumber(winner);
+            recent.push(winner);
+            if (recent.length > maxRecent) recent.shift();
+            document.getElementById('numbers').textContent = recent.slice(-maxRecent).reverse().join(', ');
+            if (winner === '0') {
+              let burnAmount;
+              if (leftToBurn1 > 500000) {
+                burnAmount = leftToBurn1 * 0.00015;
+              } else if (leftToBurn1 > 0) {
+                burnAmount = leftToBurn2 * 0.00015;
+              } else {
+                burnAmount = leftToBurn2 * 0.0003;
+              }
+              const burnFrom1 = Math.min(leftToBurn1, burnAmount);
+              const burnFrom2 = Math.min(leftToBurn2, burnAmount);
+              leftToBurn1 -= burnFrom1;
+              leftToBurn2 -= burnFrom2;
+              totalBurned += burnFrom1 + burnFrom2;
+              document.getElementById('burned').textContent = totalBurned.toFixed(3);
+              document.getElementById('left1').textContent = leftToBurn1.toFixed(3);
+              document.getElementById('left2').textContent = leftToBurn2.toFixed(3);
+            }
+          }
         } else {
-          // Continue gradual deceleration
-          const progress = elapsedLanding / landingSpinDuration;
-          spinSpeed = (spinSpeed) * (1 - progress);
-          ballSpeed = spinSpeed;
-        }
-      } else if (state === 'result') {
-        ballRadius = 0.6375 * radius; // Ball stays at 63.75% of radius
-        document.getElementById('result').textContent = `🎉 Winning Number: ${winner}`;
-        highlightWinningNumber(winner);
-        if (winner === '0') {
-          burned += 0.015;
-          document.getElementById('burned').textContent = burned.toFixed(3);
-          document.getElementById('left').textContent = (10000000 - burned).toFixed(3);
-        }
-        if (recent.length >= 4) {
-          recent = [];
-          document.getElementById('numbers').textContent = '';
-        }
-        recent.unshift(winner);
-        document.getElementById('numbers').textContent = recent.join(', ');
-        setTimeout(() => {
           startNewSpin();
-        }, 60000);
+        }
+
+        if (isNaN(spinAngle) || isNaN(ballAngle)) {
+          console.error('Invalid angles:', spinAngle, ballAngle);
+          startNewSpin();
+          return;
+        }
+
+        drawWheel(spinAngle);
+        if (showBall) drawBall(ballRadius, ballAngle);
+      } catch (e) {
+        console.error('Error in animate:', e);
       }
 
-      drawWheel(spinAngle);
-      drawBall(ballRadius, ballAngle);
       requestAnimationFrame(animate);
     }
 
     function sendMessage() {
-      const input = document.getElementById('chatInput');
-      const chatBox = document.getElementById('chatBox');
-      if (input.value) {
-        chatBox.innerHTML += `<p>${input.value}</p>`;
-        input.value = '';
-        chatBox.scrollTop = chatBox.scrollHeight;
+      try {
+        const input = document.getElementById('chatInput');
+        const chatBox = document.getElementById('chatBox');
+        if (input && input.value) {
+          chatBox.innerHTML += `<p>${input.value}</p>`;
+          input.value = '';
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }
+      } catch (e) {
+        console.error('Error in sendMessage:', e);
       }
     }
 
-    requestAnimationFrame(animate);
+    document.addEventListener('DOMContentLoaded', () => {
+      try {
+        startNewSpin();
+        animate(performance.now());
+      } catch (e) {
+        console.error('Failed to start animation:', e);
+      }
+    });
   </script>
 </body>
 </html>
