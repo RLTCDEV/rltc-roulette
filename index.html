@@ -154,7 +154,7 @@
 
     .table div.highlighted {
       background: #ff9d46;
-      color: #0f2a5e;
+      color   color: #0f2a5e;
     }
 
     .chat {
@@ -370,9 +370,9 @@
     let lastTime = startTime;
     let winner = '';
     let showBall = true;
-    const spinningDuration = 30000;
-    const ballSlowdownDuration = 20000;
-    const resultDuration = 10000;
+    const spinningDuration = 15000; // 15 seconds
+    const ballSlowdownDuration = 10000; // 10 seconds
+    const resultDuration = 5000; // 5 seconds
     const cycleDuration = spinningDuration + ballSlowdownDuration + resultDuration;
     const maxRecent = 20;
 
@@ -578,17 +578,21 @@
             if (winner === '0') {
               let burnAmount;
               if (leftToBurn1 > 500000) {
-                burnAmount = leftToBurn1 * 0.00015;
+                burnAmount = leftToBurn1 * 0.0003; // Adjusted to burn 3000
+                const actualBurn = Math.min(burnAmount, leftToBurn1);
+                leftToBurn1 -= actualBurn;
+                totalBurned += actualBurn;
               } else if (leftToBurn1 > 0) {
-                burnAmount = leftToBurn2 * 0.00015;
+                burnAmount = leftToBurn2 * 0.0003; // Adjusted to maintain consistency
+                const actualBurn = Math.min(burnAmount, leftToBurn2);
+                leftToBurn2 -= actualBurn;
+                totalBurned += actualBurn;
               } else {
                 burnAmount = leftToBurn2 * 0.0003;
+                const actualBurn = Math.min(burnAmount, leftToBurn2);
+                leftToBurn2 -= actualBurn;
+                totalBurned += actualBurn;
               }
-              const burnFrom1 = Math.min(leftToBurn1, burnAmount);
-              const burnFrom2 = Math.min(leftToBurn2, burnAmount);
-              leftToBurn1 -= burnFrom1;
-              leftToBurn2 -= burnFrom2;
-              totalBurned += burnFrom1 + burnFrom2;
               document.getElementById('burned').textContent = totalBurned.toFixed(3);
               document.getElementById('left1').textContent = leftToBurn1.toFixed(3);
               document.getElementById('left2').textContent = leftToBurn2.toFixed(3);
